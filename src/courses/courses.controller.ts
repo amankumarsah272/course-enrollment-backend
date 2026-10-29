@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -17,11 +18,22 @@ import { Roles } from '../auth/roles.decorator.js';
 @Controller('courses')
 @UseGuards(AuthGuard, RolesGuard)
 export class CoursesController {
-  constructor(private readonly coursesService: CoursesService) {}
+  constructor(private readonly coursesService: CoursesService) { }
 
   @Get()
-  findAll(@Req() req: any) {
-    return this.coursesService.findAll(req.user.role);
+  findAll(
+    @Req() req: any,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const currentPage = Math.max(1, Number(page) || 1);
+    const pageSize = Math.min(50, Math.max(1, Number(limit) || 6));
+
+    return this.coursesService.findAll(
+      req.user.role,
+      currentPage,
+      pageSize,
+    );
   }
 
   @Post()

@@ -8,18 +8,35 @@ import { PrismaService } from '../prisma/prisma.service.js';
 
 @Injectable()
 export class CoursesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
-  async findAll(role?: string) {
-    const courses = await this.prisma.course.findMany({
-      where: role === 'ADMIN' ? {} : { status: 'ACTIVE' },
-      orderBy: { title: 'asc' },
-    });
+  async findAll(role?: string, page = 1, limit = 6) {
+    const where = role === 'ADMIN' ? {} : { status: 'ACTIVE' as const };
+
+    const [courses, totalCourses] = await Promise.all([
+      this.prisma.course.findMany({
+        where,
+        orderBy: { title: 'asc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.course.count({ where }),
+    ]);
+
+    const totalPages = Math.ceil(totalCourses / limit);
 
     return {
       success: true,
       message: 'Courses fetched successfully',
       courses,
+      pagination: {
+        currentPage: page,
+        pageSize: limit,
+        totalCourses,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
     };
   }
 
