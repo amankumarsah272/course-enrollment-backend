@@ -1,57 +1,69 @@
-# Course Enrollment System - Backend
+# Course Enrollment System — Backend
 
-A backend REST API for managing courses and student enrollments, built using NestJS, TypeScript, Prisma ORM, and PostgreSQL.
+A RESTful backend API for a Course Enrollment System built with NestJS, TypeScript, Prisma ORM, and PostgreSQL.
 
 ## Live URLs
 
-- **Frontend:** https://course-enrollment-frontend-tau.vercel.app/
-- **Backend:** https://course-enrollment-backend-mg4b.onrender.com
+- **Backend API:** https://course-enrollment-backend-mg4b.onrender.com
+- **Frontend Application:** https://course-enrollment-frontend-tau.vercel.app/
 - **GitHub Repository:** https://github.com/amankumarsah272/course-enrollment-backend
 
 ## Tech Stack
 
-- NestJS and TypeScript
-- PostgreSQL
+- NestJS
+- TypeScript
 - Prisma ORM
+- PostgreSQL
 - JWT Authentication
-- Role-Based Access Control
-- bcrypt password hashing
+- Role-Based Authorization
+- REST APIs
 
 ## Features
 
-- User authentication using email and password
-- JWT-based protected routes
-- Admin and Student roles
-- Create, view, delete, and update course status
-- View available courses
+- User authentication using JWT
+- Role-based access for Admin and Student
+- Course creation and management
+- Update course status
+- Retrieve available courses
+- Server-side course pagination
+- Configurable page number and page size
+- Limit validation for pagination requests
 - Student course enrollment
-- View enrolled courses
-- Prevent duplicate course enrollments
-- PostgreSQL database with Prisma migrations
+- Prevent duplicate enrollments
+- Retrieve a student's enrolled courses
+- PostgreSQL database integration using Prisma
+
+## Pagination
+
+The courses endpoint supports server-side pagination using query parameters.
+
+**Endpoint:**
+
+`GET /courses?page=1&limit=6`
+
+| Parameter | Description |
+|---|---|
+| `page` | Page number, starting from 1 |
+| `limit` | Number of courses per page; defaults to 6 |
+
+The API response includes the courses for the requested page and pagination metadata, including total courses, total pages, and next/previous page availability.
 
 ## API Endpoints
 
-| Method | Endpoint | Access |
-|---|---|---|
-| POST | `/auth/login` | Public |
-| GET | `/courses` | Authenticated |
-| POST | `/courses` | Admin |
-| DELETE | `/courses/:id` | Admin |
-| PATCH | `/courses/:id/status` | Admin |
-| POST | `/enrollments` | Student |
-| GET | `/enrollments/my` | Student |
+### Authentication
+- `POST /auth/login` — Authenticate a user and obtain a JWT.
 
-## Demo Login Credentials
+### Courses
+- `GET /courses?page=1&limit=6` — Retrieve paginated courses.
+- `POST /courses` — Create a course (Admin).
+- `PATCH /courses/:id/status` — Update course status (Admin).
+- `DELETE /courses/:id` — Delete a course (Admin).
 
-### Admin
-- Email: `admin@example.com`
-- Password: `Admin@123`
+### Enrollments
+- `POST /enrollments` — Enroll in a course.
+- `GET /enrollments/my` — Retrieve the logged-in student's enrollments.
 
-### Student
-- Email: `student@example.com`
-- Password: `Student@123`
-
-These accounts are intended for assignment demonstration.
+Protected endpoints require a valid JWT. Access depends on the user's role.
 
 ## Run Locally
 
@@ -67,33 +79,26 @@ cd course-enrollment-backend
 npm install
 ```
 
-Create a `.env` file with your database connection string and JWT secret. Keep this file private.
+Create a `.env` file with the database connection and JWT secret required by the application:
 
-Generate the Prisma client and apply migrations:
-
-```bash
-npx prisma generate
-npx prisma migrate deploy
+```env
+DATABASE_URL="your_postgresql_connection_string"
+JWT_SECRET="your_jwt_secret"
 ```
 
-Start the development server:
+Configure Prisma and apply the database migrations according to the project's Prisma setup.
+
+### Start the application
 
 ```bash
 npm run start:dev
 ```
 
-The backend runs on `http://localhost:3001`.
+The backend runs locally on port `3001` with the current project configuration.
 
-## Database
+## Deployment
 
-PostgreSQL stores user, course, and enrollment data. Prisma manages database access and migrations.
-
-## Security
-
-- Passwords are hashed before storage.
-- JWT authentication protects restricted endpoints.
-- Role-based access controls Admin and Student permissions.
-- Secrets and database credentials must not be committed to GitHub.
+The backend is deployed on Render and uses a PostgreSQL database hosted on Neon.
 
 ## Author
 
